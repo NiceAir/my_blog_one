@@ -43,6 +43,7 @@ class Post(models.Model):
 
 
     #下去试试 models.TimeField()
+
     created_time = models.DateTimeField(auto_now_add=True)
     modified_time = models.DateTimeField()
 
