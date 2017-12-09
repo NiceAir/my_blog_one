@@ -1,0 +1,1397 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+  <!-- Required meta tags -->
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+  <meta name="baidu-site-verification" content="GOgEP8c1pN"/>
+
+
+  <title>
+    注销和页面跳转_Django用户认证系统_追梦人物的博客</title>
+
+  <link href="https://cdn.bootcss.com/font-awesome/4.7.0/css/font-awesome.min.css"
+        rel="stylesheet">
+  <link rel="stylesheet" href="/static/blog/css/mobi.min.css">
+  <link rel="stylesheet" href="/static/blog/css/modal.min.css">
+  <link rel="stylesheet" href="/static/blog/css/friendly.css">
+  <link rel="stylesheet" href="/static/blog/css/blog.css?v0.12">
+  <script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+  <script src="/static/blog/js/menu.js"></script>
+  <script src="/static/blog/js/modal.min.js"></script>
+  <script src="/static/blog/js/blog.js"></script>
+
+
+
+    <script>
+        // baidu statistics
+        var _hmt = _hmt || [];
+        (function () {
+            var hm = document.createElement("script");
+            hm.src = "https://hm.baidu.com/hm.js?fb59b2a6022bccc02671a750f61c356b";
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(hm, s);
+        })();
+
+        // baidu auto push
+        (function () {
+            var bp = document.createElement('script');
+            var curProtocol = window.location.protocol.split(':')[0];
+            if (curProtocol === 'https') {
+                bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+            }
+            else {
+                bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+            }
+            var s = document.getElementsByTagName("script")[0];
+            s.parentNode.insertBefore(bp, s);
+        })();
+    </script>
+
+
+</head>
+<body class="bg-light">
+<header>
+  <nav class="flex-center bg-white nav-bar">
+    <div class="container-wider flex-middle">
+
+  <a class="show-on-mobile nav-link m-5" id="js-sidebar-btn" href="#" role="button">
+    <i class="fa fa-chevron-right" aria-hidden="true"></i>
+  </a>
+
+      <a class="nav-bar-logo mr-7" href="/">
+        <img src="/static/blog/images/logo.png" alt="blog logo">
+      </a>
+      <ul class="unit-0 hide-on-mobile nav-bar-nav">
+        <li class="nav-item mr-7">
+          <a class="nav-link" href="/">首页</a>
+        </li>
+        <li class="nav-item mr-7">
+          <a class="nav-link" href="/tutorials/">教程</a>
+        </li>
+        <li class="nav-item mr-7">
+          <a class="nav-link" href="/categories/">分类</a>
+        </li>
+        <li class="nav-item mr-7">
+          <a class="nav-link" href="/archives/">归档</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/donate/">赞助</a>
+        </li>
+      </ul>
+      <div class="unit flex-right flex-middle">
+        <form class="hide-on-mobile flex-left flex-middle search-form mr-5" id="search-form"
+              action="/search/">
+          <input class="unit" type="search" name="q" placeholder="搜索..."/>
+          <button class="unit-0" type="submit" role="button">
+            <i class="fa fa-search" aria-hidden="true"></i>
+          </button>
+        </form>
+        <a class="show-on-mobile nav-link fs-7 mr-7" id="js-search-btn" href="#" role="button">
+          <i class="fa fa-search" aria-hidden="true"></i>
+        </a>
+        <div class="flex-middle notification">
+
+            <a class="nav-link" href="/accounts/login/">
+              <i class="fa fa-sign-in" aria-hidden="true"></i>
+            </a>
+
+        </div>
+        <div class="show-on-mobile flex-middle">
+          <a class="nav-link fs-7 ml-7 mr-5" id="menu-toggle" href="#">
+            <i class="fa fa-ellipsis-v" aria-hidden="true"></i>
+          </a>
+          <ul class="menu bg-white" data-menu data-menu-toggle="#menu-toggle">
+            <li class="nav-item mr-7">
+              <a class="nav-link" href="/">首页</a>
+            </li>
+            <li>
+              <a href="/tutorials/">教程</a>
+            </li>
+            <li>
+              <a href="/categories/">分类</a>
+            </li>
+            <li>
+              <a href="/archives/">归档</a>
+            </li>
+            <li>
+              <a href="/donate/">赞助</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+</header>
+<section class="flex-center">
+  <div class="container-wider">
+    <!-- 模态框（Modal） -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog"
+         aria-labelledby="myModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+              &times;
+            </button>
+            <h4 class="modal-title" id="myModalLabel">设置评论回复接收邮箱</h4>
+            <div class="text-primary mt-2">邮箱仅用于接收回复提醒，不会被公开。</div>
+
+          </div>
+          <div class="modal-body">
+            <form class="form email-binding-form" action="/comments/ajax_email_binding/">
+              <div class="message">
+                <span class="text-danger"></span>
+              </div>
+              <input type='hidden' name='csrfmiddlewaretoken' value='mAHvizWReItLySGNInpLT0HwxLwDSGY65oHjJit69Vwi2g984pXVZEADjDqTsdIq' />
+              <div class="flex-left units-gap">
+                <label class="unit-0 text-right" for="multiple-inputs-name">邮箱: </label>
+                <div class="unit">
+                  <input type="email" name="email" id="id_email" placeholder="请输入绑定邮箱"/>
+                </div>
+                <div class="unit-0">
+                  <button class="btn" id="js-send" type="button"
+                          data-target="/comments/ajax_verification_code/">发送验证码
+                  </button>
+                </div>
+              </div>
+              <div class="flex-left units-gap">
+                <label class="unit-0 text-right" for="multiple-inputs-name">验证码: </label>
+                <div class="unit">
+                  <input type="text" name="verification_code" id="id_verification_code"
+                         placeholder="请输入接收到的验证码"/>
+                </div>
+              </div>
+              <div class="flex-right">
+                <button type="button" class="btn btn-danger mr-3" data-dismiss="modal">关闭</button>
+                <button type="submit" class="btn btn-primary" id="js-submit">设置</button>
+              </div>
+            </form>
+          </div>
+        </div><!-- /.modal-content -->
+      </div><!-- /.modal -->
+    </div>
+    <div class="flex-left flex-wrap "
+         style="margin-top: 60px">
+
+  <aside class="unit-1-4 unit-1-on-mobile top-gap">
+    <div class="scroll-view bg-white card toc-sidebar" style="height: 100%">
+      <div class="card-header">
+        目录
+      </div>
+      <div class="card-body">
+        <ul>
+          <li>
+            <h6 class="top-gap-0"><a href="">Django用户认证系统</a></h6>
+            <ul>
+
+                <li>
+                  <a href="/post/30/">基本设置</a>
+
+                </li>
+
+                <li>
+                  <a href="/post/31/">拓展 User 模型</a>
+
+                </li>
+
+                <li>
+                  <a href="/post/35/">注册</a>
+
+                </li>
+
+                <li>
+                  <a href="/post/46/">登录</a>
+
+                </li>
+
+                <li>
+                  <a href="/post/47/">注销和页面跳转</a>
+
+                    <div class="toc">
+<ul>
+<li><a href="#注销登录">注销登录</a></li>
+<li><a href="#页面跳转">页面跳转</a><ul>
+<li><a href="#登录和注销后返回当前页面">登录和注销后返回当前页面</a></li>
+<li><a href="#注册后返回当前页面">注册后返回当前页面</a></li>
+</ul>
+</li>
+<li><a href="#总结">总结</a></li>
+</ul>
+</div>
+
+
+                </li>
+
+                <li>
+                  <a href="/post/48/">修改密码</a>
+
+                </li>
+
+                <li>
+                  <a href="/post/49/">重置密码</a>
+
+                </li>
+
+                <li>
+                  <a href="/post/50/">自定义认证后台</a>
+
+                </li>
+
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </aside>
+
+
+  <div class="unit-3-4 unit-1-on-mobile top-gap">
+
+
+
+<div class="bg-white card post-card px-7 py-5">
+
+<article class="post">
+  <h1 class="top-gap-0">注销和页面跳转</h1>
+  <ul class="list-inline dot-divider post-meta">
+    <li class="list-inline-item text-small text-muted">
+      5 月，2 周前
+    </li>
+    <li class="list-inline-item text-small text-muted">5145 字
+    </li>
+    <li class="list-inline-item text-small text-muted">
+      5332 阅读
+    </li>
+    <li class="list-inline-item text-small text-muted">
+      20 评论
+    </li>
+  </ul>
+  <div class="top-gap-big post-body">
+    <p>当用户想切换登录账号，或者想退出登录状态时，这时候就需要注销已登录的账号。现在我们来为网站添加注销登录的功能，这个功能 Django 也已经为我们提供，我们只需做一点简单配置。</p>
+<h2 id="注销登录">注销登录</h2>
+<p>注销登录的视图为 logout，我们简单修改一下 index.html 的代码，添加一个注销登录的按钮：</p>
+<div class="codehilite"><pre><span></span>templates/index.html
+
+{% if user.is_authenticated %}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>你已登录，欢迎你：<span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;#&quot;</span><span class="p">&gt;</span>{{ user.username }}<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-default&quot;</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;logout&#39; %}&quot;</span><span class="p">&gt;</span>注销登录<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+{% else %}
+  <span class="p">&lt;</span><span class="nt">p</span><span class="p">&gt;</span>你还没有登录，请
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-default&quot;</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;login&#39; %}&quot;</span><span class="p">&gt;</span>登录<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+    或者
+    <span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-default&quot;</span><span class="p">&gt;&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;users:register&#39; %}&quot;</span><span class="p">&gt;</span>注册<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+{% endif %}
+</pre></div>
+
+
+<p>如果你已经登陆，就会看到一个注销登录的按钮，点击该按钮就会跳转到注销登录已成功地页面。再一次访问首页，你将看到登录、注册按钮，说明你已经成功注销登录状态了。</p>
+<h2 id="页面跳转">页面跳转</h2>
+<p>我们之前在登录、注册和注销的过程中发现，登录成功后会跳转到一个 404 页面，注册成功后返回的是首页，而注销登录后跳转到了 Admin 后台的注销成功页面。对于一个网站来说，比较好的用户体验是登录、注册和注销后跳转回用户之前访问的页面。否则用户在你的网站东跳转西跳转好不容易找到了想看的内容，结果他已登录给他跳转回了首页，这会使用户非常愤怒（我在有些网站就遇到过）。接下来我们看看如何让登录、注册和注销后跳转回用户之前访问的页面。</p>
+<h3 id="登录和注销后返回当前页面">登录和注销后返回当前页面</h3>
+<p>在登录和注销的视图函数中，Django 已经为我们处理了跳转回用户之前访问页面的流程。其实现的原理是，在登录和注销的流程中，始终传递一个 next 参数记录用户之前访问页面的 URL。因此，我们需要做的就是在用户访问登录或者注销的页面时，在 URL 中传递一个 next 参数给视图函数，具体做法如下：</p>
+<div class="codehilite"><pre><span></span>templates/index.html
+
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-default&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;logout&#39; %}?next={{ request.path }}&quot;</span><span class="p">&gt;</span>注销登录<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-default&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;login&#39; %}?next={{ request.path }}&quot;</span><span class="p">&gt;</span>登录<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>可以看到，我们在登录和注销的 URL 后加了 next 参数，其值为 {{ request.path }}。request.path 是用户当前访问页面的 URL。在 URL 中传递参数的方法就是在要传递的参数前加一个 ？然后写上传递的参数名和参数值，用等号链接。关于在 URL 中传递参数具体请 HTTP 的相关协议。</p>
+<p>为了在整个登录流程中记录 next 的值，还需要在登录表单中增加一个表单控件，用于传递 next 值。</p>
+<div class="codehilite"><pre><span></span>registration/login.html
+
+<span class="p">&lt;</span><span class="nt">form</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;{% url &#39;login&#39; %}&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+  ...
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary btn-block&quot;</span><span class="p">&gt;</span>登录<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;next&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ next }}&quot;</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p>即在表单中增加了一个隐藏的 input 控件，其值为 {{ next }}，即之前通过 URL 参数传递给登录视图函数的，然后登录视图函数又将该值传递给了 login.html 模板。这样在整个登录流程中，始终有一个记录着用户在登录前页面 URL 的变量 next 在视图和模板间来回传递，知道用户登录成功后再跳转回 next 记录的页面 URL。</p>
+<p>现在你可以点击登录和注销的按钮来走一遍登录和注销流程，发现页面跳转已经符合我们的需求了。不过还由一点点小瑕疵，就是如果用户不是通过点击登录和注销按钮，而是直接在页面输入 URL 来访问相关页面话，那这个 next 就没有值，从而无法向之前那样跳转回用户之前访问的页面。比如用户想登录，他直接在浏览器的地址栏输入 /users/login/，由于在 URL 中没有传递 next，所以就无法记录用户登录前的页面 URL，那在登录成功后就无法将他带回登录前的页面了。当然这种情况是极为罕见的，很少有用户会记住你网站的 URL 地址，但如果真有这样的用户，我们就把他跳转回首页吧，因为没有任何办法记录他之前访问的页面。要想把用户跳转回首页，可以在 settings 中做如下设置：</p>
+<div class="codehilite"><pre><span></span><span class="n">LOGOUT_REDIRECT_URL</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+<span class="n">LOGIN_REDIRECT_URL</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span>
+</pre></div>
+
+
+<p>这样，整个登录和注销流程就形成了一个闭环。如果用户通过点击登录或者注销按钮登录和注销的话，在登录或者注销成功后就会被带回登录或者注销前的页面，否则将他带回网站首页。</p>
+<h3 id="注册后返回当前页面">注册后返回当前页面</h3>
+<p>类似的，我们也希望用户注册后返回注册前页面。不过由于注册视图函数是我们自己写的，之前的处理方式是用户注册成功后将其带回网站首页，因此需要修改一下注册视图函数：</p>
+<div class="codehilite"><pre><span></span><span class="n">users</span><span class="o">/</span><span class="n">views</span><span class="o">.</span><span class="n">py</span>
+
+<span class="k">def</span> <span class="nf">register</span><span class="p">(</span><span class="n">request</span><span class="p">):</span>
+    <span class="c1"># 从 get 或者 post 请求中获取 next 参数值</span>
+    <span class="c1"># get 请求中，next 通过 url 传递，即 /?next=value</span>
+    <span class="c1"># post 请求中，next 通过表单传递，即 &lt;input type=&quot;hidden&quot; name=&quot;next&quot; value=&quot;{{ next }}&quot;/&gt;</span>
+    <span class="n">redirect_to</span> <span class="o">=</span> <span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">GET</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;next&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+
+    <span class="c1"># 只有当请求为 POST 时，才表示用户提交了注册信息</span>
+    <span class="k">if</span> <span class="n">request</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+        <span class="c1"># request.POST 是一个类字典数据结构，记录了用户提交的注册信息</span>
+        <span class="c1"># 这里提交的就是用户名（username）、密码（password）、确认密码、邮箱（email）</span>
+        <span class="c1"># 用这些数据实例化一个用户注册表单</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">RegisterForm</span><span class="p">(</span><span class="n">request</span><span class="o">.</span><span class="n">POST</span><span class="p">)</span>
+
+        <span class="c1"># 验证数据的合法性</span>
+        <span class="k">if</span> <span class="n">form</span><span class="o">.</span><span class="n">is_valid</span><span class="p">():</span>
+            <span class="c1"># 如果提交数据合法，调用表单的 save 方法将用户数据保存到数据库</span>
+            <span class="n">form</span><span class="o">.</span><span class="n">save</span><span class="p">()</span>
+
+            <span class="k">if</span> <span class="n">redirect_to</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="n">redirect_to</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">redirect</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># 请求不是 POST，表明用户正在访问注册页面，展示一个空的注册表单给用户</span>
+        <span class="n">form</span> <span class="o">=</span> <span class="n">RegisterForm</span><span class="p">()</span>
+
+    <span class="c1"># 渲染模板</span>
+    <span class="c1"># 如果用户正在访问注册页面，则渲染的是一个空的注册表单</span>
+    <span class="c1"># 如果用户通过表单提交注册信息，但是数据验证不合法，则渲染的是一个带有错误信息的表单</span>
+    <span class="c1"># 将记录用户注册前页面的 redirect_to 传给模板，以维持 next 参数在整个注册流程中的传递</span>
+    <span class="k">return</span> <span class="n">render</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="s1">&#39;users/register.html&#39;</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;form&#39;</span><span class="p">:</span> <span class="n">form</span><span class="p">,</span> <span class="s1">&#39;next&#39;</span><span class="p">:</span> <span class="n">redirect_to</span><span class="p">})</span>
+</pre></div>
+
+
+<p>逻辑非常简答，就是首先尝试从用户的 GET 或者 POST 请求中获取 next 参数值，即在注册成功后需要跳转的 URL，如果有值，注册成功后跳转到该 URL，否则跳转回首页。同是不要忘记将该值传给模板，以维持 next 参数在整个注册流程中的传递。</p>
+<p>接下来修改模板，和登录模板的设置是一样的：</p>
+<div class="codehilite"><pre><span></span>registration/login.html
+
+<span class="p">&lt;</span><span class="nt">button</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-default&quot;</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">a</span> <span class="na">href</span><span class="o">=</span><span class="s">&quot;{% url &#39;users:register&#39; %}?next={{ request.path }}&quot;</span><span class="p">&gt;</span>注册<span class="p">&lt;/</span><span class="nt">a</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<div class="codehilite"><pre><span></span>templates/users/register.html
+
+<span class="p">&lt;</span><span class="nt">form</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;form&quot;</span> <span class="na">action</span><span class="o">=</span><span class="s">&quot;{% url &#39;users:register&#39; %}&quot;</span> <span class="na">method</span><span class="o">=</span><span class="s">&quot;post&quot;</span><span class="p">&gt;</span>
+  ...
+  <span class="p">&lt;</span><span class="nt">button</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">class</span><span class="o">=</span><span class="s">&quot;btn btn-primary btn-block&quot;</span><span class="p">&gt;</span>注册<span class="p">&lt;/</span><span class="nt">button</span><span class="p">&gt;</span>
+  <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;hidden&quot;</span> <span class="na">name</span><span class="o">=</span><span class="s">&quot;next&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;{{ next }}&quot;</span><span class="p">/&gt;</span>
+<span class="p">&lt;/</span><span class="nt">form</span><span class="p">&gt;</span>
+</pre></div>
+
+
+<p><strong>注意：</strong>在注册视图函数中，对 next 的任意值我们都进行了跳转，这可能导致一些安全问题。正确的做法应该是在跳转前，对需要跳转的 URL 做安全性检查。不过这里只作为一个示例，在实际项目中请仔细考虑可能的安全后果，以及添加必要的安全性检查代码。</p>
+<p>OK，如此修改以后，用户的登录、注册和注销流程的用户体验可以形成一个比较良好闭环了。接下来就来实现修改密码的功能。</p>
+<h2 id="总结">总结</h2>
+<p>本教程的示例项目代码位于 GitHub：<a href="https://github.com/zmrenwu/django-auth-example">Django Auth Example</a>。</p>
+<p>如果遇到问题，请通过下面的方式寻求帮助。</p>
+<ul>
+<li>在下方评论区留言。</li>
+<li>在 <a href="http://www.pythonzh.cn/category/newbie-qa/">Pythonzhcn 社区的新手问答版块</a> 发布帖子。</li>
+</ul>
+<p>更多 Django 相关教程，请访问我的个人博客：<a href="http://zmrenwu.com/">追梦人物的博客</a>。</p>
+    <p class="text-center">
+      -- EOF --
+    </p>
+    <div>
+      <button class="btn btn-primary" id="js-reward"><i class="fa fa-jpy"
+                                                        aria-hidden="true"></i>
+        如果觉得文章对你有帮助，请随意打赏
+        <i class="fa fa-chevron-down" aria-hidden="true"></i>
+      </button>
+      <div class="flex-left flex-wrap units-gap-big mt-4" style="display: none">
+        <div class="unit unit-1-on-mobile flex-center">
+          <figure>
+            <img src="/static/blog/images/weixinpay.jpg" alt="微信支付收款二维码"
+                 style="width: 250px">
+            <figcaption class="text-center fs-6 mt-2" style="color: green">微信</figcaption>
+          </figure>
+        </div>
+        <div class="unit unit-1-on-mobile flex-center">
+          <figure>
+            <img src="/static/blog/images/alipay.jpg" alt="支付宝收款二维码" style="width: 250px">
+            <figcaption class="text-center fs-6 mt-2 text-primary">支付宝</figcaption>
+          </figure>
+        </div>
+      </div>
+    </div>
+    <div class="post-tags">
+      <ul class="list-inline">
+
+      </ul>
+    </div>
+  </div>
+</article>
+  <div class="top-gap">
+    <div class="jiathis_style">
+      <span class="jiathis_txt">分享到：</span>
+      <a class="jiathis_button_qzone">QQ空间</a>
+      <a class="jiathis_button_tsina">新浪微博</a>
+      <a class="jiathis_button_tqq">腾讯微博</a>
+      <a class="jiathis_button_weixin">微信</a>
+      <a href="http://www.jiathis.com/share?uid=2128865"
+         class="jiathis jiathis_txt jiathis_separator jtico jtico_jiathis"
+         target="_blank">更多</a>
+      <a class="jiathis_counter_style"></a>
+    </div>
+    <script type="text/javascript">
+        var jiathis_config = {data_track_clickback: 'true'};
+    </script>
+    <script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=2128865"
+            charset="utf-8"></script>
+    <!-- JiaThis Button END -->
+  </div>
+  <br>
+  <div class="top-gap clearfix">
+
+      <a href="/post/46/">
+        <i class="fa fa-angle-double-left" aria-hidden="true"></i>
+        登录
+      </a>
+
+
+      <a class="float-right" href="/post/48/">
+        修改密码
+        <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+      </a>
+
+  </div>
+
+
+  <section class="comment-area top-gap-big" id="comment-area">
+    <h5>20 条评论 / 10 人参与</h5>
+
+
+<div class="flex-center top-gap login-panel p-7">
+  <div>
+    <div class="text-muted text-center login-header"><span>登录后回复</span></div>
+    <div class="flex-center text-center social-icons mt-3">
+                        <span class="weibo mr-3">
+                            <a href="/accounts/weibo/login/">
+                                <i class="fa fa-weibo" aria-hidden="true"></i>
+                            </a>
+                        </span>
+      <span class="github">
+                            <a href="/accounts/github/login/">
+                                <i class="fa fa-github" aria-hidden="true"></i>
+                            </a>
+                        </span>
+    </div>
+  </div>
+</div>
+
+    <div class="top-gap-big comment-list">
+
+    <div class="flex-left py-4" id="c1740">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/31182303?v=4"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">wshuo
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    <p style="">博主你少些一个在register.html的隐藏标签，否则在views.py函数写的获取next的参数没什么作用了，只能在登录界面跳转到注册界面的时候在url中看到next参数，而真正从注册界面跳转到用户之前登录的界面是不能实现的（即跳转不到redirect_to），因为你没有在register.html中设置隐藏标签，所以也就获取不到next参数。所以注册成功后一定会跳转到index.html界面。另外感谢博主！教会我这么多东西<br></p>
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">1 月前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1740"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c1767">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="http://tva4.sinaimg.cn/crop.0.0.960.960.180/006u9gsrjw8f4divjkkm4j30qo0qowgp.jpg"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">mdzz丶萌的铮铮
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">wshuo
+
+
+  </header>
+  <div class="comment-body">
+    <p>不是少了隐藏标签，是没加index.html注册button的next获取<br></p>
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">4 周，1 日前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1767"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c1733">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="https://avatars3.githubusercontent.com/u/20544812?v=4"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">piupiuqm
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    <p style="">谢谢博主的文章，很强大！</p><p style="">但是前端的button标签和a标签好像有点冲突，重叠在一起的button标签内部嵌入a标签，点击按钮没反应，a标签的跳转作用就没有了，只用a标签不用button标签页面可以正常跳转。不知道是不是这个问题。<br></p>
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">1 月前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1733"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c1735">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/31182303?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">wshuo
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">piupiuqm
+
+
+  </header>
+  <div class="comment-body">
+    <p style="">我也遇到了这个问题，应该是按钮不兼容firefox(我猜你用的也是Firefox，因为我测试了别的浏览器，都好使)。另外真心感谢博主，一直在看博主的文章，认真学习中！谢谢！<br></p>
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">1 月前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1735"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+              <hr class="m-0">
+
+
+            <div class="flex-left py-4" id="c1738">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars3.githubusercontent.com/u/20544812?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">piupiuqm
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">wshuo
+
+
+  </header>
+  <div class="comment-body">
+    <p style="">对，我是用firefox浏览器，我后来也测试了其他浏览器，没什么问题，应该就是浏览器兼容的原因<br></p>
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">1 月前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1738"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c1731">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="https://avatars1.githubusercontent.com/u/12219040?v=4"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">Sora Shiro
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    <p>博主您好，十分感谢您的博客，对我帮助很大，提个无关代码逻辑的意见：</p><blockquote><p>接下来修改模板，和登录模板的设置是一样的：&nbsp;</p><p><code>registration/login.html</code><br></p><p><code>...</code></p></blockquote><p>这里的&nbsp;<code>registration/login.html</code> 应该是&nbsp;<code>registration/index.html</code>，:)&nbsp;</p><p>最后再次表示感谢，找了很多用户管理的实现都没找到满意的，直到看到您的博客，很受用，辛苦了</p>
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">1 月前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1731"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+        <div class="comment-descendant-list">
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c1227">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="http://tvax1.sinaimg.cn/crop.9.0.493.493.180/0067Ycaxly8fk4a563ih2j30e80dpmxi.jpg"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">韦子扬不想穿秋裤
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    您好，我这里有个问题，用户成功注册后，网站上应该出现一个提示说用户成功注册了啊，但是您这么直接redirect到了之前的界面，用户根本不知道发生了什么。。
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，1 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1227"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c1231">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/13174219?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">追梦人物
+
+            <span class="master">[博主]</span>
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">韦子扬不想穿秋裤
+
+
+  </header>
+  <div class="comment-body">
+    嗯，我同意你的观点。我觉得可以使用 django.contrib.message 框架生成提示消息。
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，1 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1231"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+              <hr class="m-0">
+
+
+            <div class="flex-left py-4" id="c1243">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="http://tvax1.sinaimg.cn/crop.9.0.493.493.180/0067Ycaxly8fk4a563ih2j30e80dpmxi.jpg"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">韦子扬不想穿秋裤
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">追梦人物
+
+            <span class="master">[博主]</span>
+
+
+  </header>
+  <div class="comment-body">
+    对的，可以在教程了补充一下，后面有很多都有一样的问题。谢谢您
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，1 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1243"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c1041">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="http://tvax1.sinaimg.cn/crop.0.0.640.640.180/006UjRKVly8fiejzyfexmj30sg0hs7gm.jpg"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">Kakuchange
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    博主你好，我发现在我的环境ubuntu16.04 python2.7 firefox浏览器下示例中给出的<button>标签不起作用，删除仅留<a>{% url 'logout' %}可以正常登出，具体原因未知，希望同样遇到的朋友，不要像我一样，浪费了很久才找到。<br />总结查找问题思路<br />1.未有任何报错，一开始怀疑是未完全按照博主所在，而是在users/urls.py 中添加urlpatterns，再include到project的urls.py中，改成完全按博客来还是一样的问题（其实这一步完全不必要，确定好views函数渲染模板位置，指定正确的url，即可正确显示了Index.html）<br />2.检测模板变量引用是否正确{% url 'logout' %} 匹配name=logout的url，与project.urls.py中的url模式及当前页面的url对比无误。<br />3.手动输入url竟然可以登出！那就是<button>点击无效了= =
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1041"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c1043">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/13174219?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">追梦人物
+
+            <span class="master">[博主]</span>
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">Kakuchange
+
+
+  </header>
+  <div class="comment-body">
+    这可能是浏览器兼容性问题。
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1043"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c1005">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="https://avatars0.githubusercontent.com/u/26816176?v=4"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">wuya34
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    博主这里有一个登录逻辑问题：如果是从登录界面的注册进入注册页面，注册完成后跳回的是注册页面，而我们需要跳回的是点击登录时的页面
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1005"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c1006">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars0.githubusercontent.com/u/26816176?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">wuya34
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">wuya34
+
+
+  </header>
+  <div class="comment-body">
+    博主这里有一个登录逻辑问题：如果是从登录界面的注册进入注册页面，注册完成后跳回的是登录页面，而我们需要跳回的是点击登录时的页面<br />（上面留言写错了）
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1006"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+              <hr class="m-0">
+
+
+            <div class="flex-left py-4" id="c1014">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/13174219?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">追梦人物
+
+            <span class="master">[博主]</span>
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">wuya34
+
+
+  </header>
+  <div class="comment-body">
+    嗯，相信明白了原理后自己定制一下跳转流程也是很简单的。我这里仅给出一个示例。
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1014"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c774">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="https://avatars0.githubusercontent.com/u/21997474?v=4"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">mengguiyouziyi
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    这里还是有个小小漏洞，就是我注册之后应该返回的是登录后渲染的首页，而不应该是未登录渲染的界面。这个该怎么处理呢？貌似is_authenticatied只对login管用
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">4 月，2 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/774"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c799">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/13174219?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">追梦人物
+
+            <span class="master">[博主]</span>
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">mengguiyouziyi
+
+
+  </header>
+  <div class="comment-body">
+    不会的，只要你登录成功后显示的页面就是 authenticated 过的页面了。
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">4 月，2 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/799"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+              <hr class="m-0">
+
+
+            <div class="flex-left py-4" id="c1042">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="http://tvax1.sinaimg.cn/crop.0.0.640.640.180/006UjRKVly8fiejzyfexmj30sg0hs7gm.jpg"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">Kakuchange
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">mengguiyouziyi
+
+
+  </header>
+  <div class="comment-body">
+    我也遇到了同样的问题，注册成功后返回未登录 的主页
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1042"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+              <hr class="m-0">
+
+
+            <div class="flex-left py-4" id="c1044">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars2.githubusercontent.com/u/13174219?v=4"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">追梦人物
+
+            <span class="master">[博主]</span>
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">Kakuchange
+
+
+  </header>
+  <div class="comment-body">
+    注册后是需要再次登录才行的，没有自动登录机制。
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">3 月，3 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/1044"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+      <hr class="m-0">
+
+
+    <div class="flex-left py-4" id="c555">
+      <div class="unit-0">
+        <img class="comment-avatar mr-3" src="https://avatars3.githubusercontent.com/u/13173323?v=3"/>
+      </div>
+      <div class="unit">
+        <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">Little May
+
+        </span>
+
+  </header>
+  <div class="comment-body">
+    老师，我想请问一下在注销用户的时候，我在urls.py中添加了url(r'^logout', views.log_out, name='log_out')，并且在views.py中添加对应的log_out函数调用django自带的logout()函数，才能实现您这里说的注销。仅仅更改index.html中的url 'logout'会提示找不到合适的正则匹配，请问是不是我哪里方法不对？
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">5 月，1 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/555"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+          <hr class="">
+
+        <div class="comment-descendant-list">
+
+            <div class="flex-left py-4" id="c556">
+              <div class="unit-0">
+                <img class="comment-avatar mr-3" src="https://avatars3.githubusercontent.com/u/13173323?v=3"/>
+              </div>
+              <div class="unit">
+
+  <div class="comment-main">
+  <header class="comment-user">
+        <span class="text-small text-muted nickname">Little May
+
+        </span>
+
+    <span class="reply-label text-small text-muted">
+                                                        <i class="fa fa-share" aria-hidden="true"></i>
+                                                    </span>
+    <span class="nickname text-small text-muted">Little May
+
+
+  </header>
+  <div class="comment-body">
+    额，找到问题了，因为添加这个语句url(r'^', include('django.contrib.auth.urls'))的时候把users也带上了，所以地址不对。打扰啦~学到很多，老师辛苦了~~
+  </div>
+  <footer class="comment-footer flex-left">
+    <ul class="unit list-inline dot-divider">
+      <li class="list-inline-item">
+        <time class="text-small text-muted">5 月，1 周前</time>
+      </li>
+      <li class="list-inline-item">
+        <a href="/comments/reply/556"
+           class="reply-btn text-small text-muted">回复</a>
+      </li>
+    </ul>
+  </footer>
+</div>
+
+              </div>
+            </div>
+
+
+        </div>
+      </div>
+    </div>
+
+
+</div>
+  </section>
+</div>
+  </div>
+
+    </div>
+  </div>
+</section>
+<footer class="bg-white py-5 mt-5 text-small text-muted">
+  <div class="flex-center">
+    <div>&copy; 2017 追梦人物的博客</div>
+  </div>
+  <div class="flex-center">
+    <div>浙ICP备 15005796号-2</div>
+  </div>
+</footer>
+<script>
+    $('[data-menu]').menu();
+
+    var InterValObj; //timer变量，控制时间
+    var curCount = 120;//当前剩余秒数
+
+    $('#js-send').on('click', function (event) {
+        var $this = $(this);
+        var $targetURL = $this.attr('data-target');
+        $.post(
+            $targetURL,
+            {email: $('#id_email').val()},
+            function (data) {
+                if (data.ok) {
+                    $this.attr("disabled", "true");
+                    $this.text("重新发送验证码" + "(" + curCount + ")");
+                    InterValObj = window.setInterval(SetRemainTime, 1000); //启动计时器，1秒执行一次
+                    $('.message')
+                        .find('span')
+                        .text(data.msg)
+                } else {
+                    $('.message').find('span').text(data.msg)
+                }
+            }
+        );
+        return false;
+    });
+
+    //timer处理函数
+    function SetRemainTime() {
+        if (curCount === 0) {
+            window.clearInterval(InterValObj);//停止计时器
+            $('#js-send').removeAttr("disabled");//启用按钮
+            $('#js-send').text("重新发送验证码");
+        }
+        else {
+            curCount--;
+            $('#js-send').text("重新发送验证码" + "(" + curCount + ")");
+        }
+    }
+
+    $('#js-submit').on('click', function (event) {
+        var $this = $(this);
+        var $form = $('.email-binding-form');
+        var $targetURL = $form.attr('action');
+        console.log($targetURL);
+
+        $.post(
+            $targetURL,
+            {
+                email: $('#id_email').val(),
+                verification_code: $('#id_verification_code').val()
+            },
+            function (data) {
+                if (data.ok) {
+                    location.reload();
+                } else {
+                    $('.message')
+                        .find('span')
+                        .text(data.msg)
+                }
+            }
+        );
+        return false;
+    });
+
+
+    var editor = new Simditor({
+        textarea: $('#id_comment'),
+        placeholder: "提出你的见解...",
+        toolbarFloat: false,
+        cleanPaste: true,
+        toolbar: [
+            'bold',
+            'italic',
+            'underline',
+            'strikethrough',
+            'color',
+            'ol',
+            'ul',
+            'blockquote',
+            'code',
+            'table',
+            'link',
+            'image',
+            'hr'
+        ]
+    });
+</script>
+
+
+</body>
+</html>
