@@ -30,7 +30,7 @@ pycparser==2.18
 PyDispatcher==2.0.5
 Pygments==2.2.0
 pyOpenSSL==17.3.0
-pywin32==219
+pywin32==301
 queuelib==1.4.2
 requests==2.18.4
 Scrapy==1.4.0
